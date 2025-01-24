@@ -1,5 +1,9 @@
+let () = Random.self_init ()
+
 type phosphate = string
 type deoxyribose = string
+
+(* type nucleobase = A | T | C | G | U | None *)
 type nucleobase = A | T | C | G | U | None
 
 type nucleotide = {
@@ -20,7 +24,6 @@ type helix = nucleotide list
 
 let generate_helix n =
   let random_nucleobase () =
-    Random.self_init ();
     match Random.int 4 with 0 -> 'A' | 1 -> 'T' | 2 -> 'C' | _ -> 'G'
   in
   let rec loop result i =
@@ -70,19 +73,47 @@ let complementary_helix (h : helix) : helix =
 
 type rna = nucleobase list
 
+(* generate_rna の修正 *)
+
 let generate_rna h =
-  let complementary_nucleotide n =
-    {
-      phosphate = "phosphate";
-      deoxyribose = "deoxyribose";
-      nucleobase =
-        (match n with A -> U | T -> A | C -> G | G -> C | _ -> None);
-    }
+  let complementary_base n =
+    match n with A -> U | T -> A | C -> G | G -> C | _ -> None
   in
   let rec loop result lst =
     match lst with
     | [] -> rev result
     | { phosphate = _; deoxyribose = _; nucleobase = n } :: rest ->
-        loop (complementary_nucleotide n :: result) rest
+        loop (complementary_base n :: result) rest
   in
   loop [] h
+
+let () =
+  (* Test generate_helix *)
+  let h1 = generate_helix 5 in
+  assert (List.length h1 = 5);
+  List.iter
+    (fun n ->
+      assert (n.phosphate = "phosphate" && n.deoxyribose = "deoxyribose"))
+    h1;
+
+  (* Test helix_to_string *)
+  let h2 =
+    [
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = A };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = T };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = C };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = G };
+    ]
+  in
+  assert (helix_to_string h2 = "ATCG");
+
+  (* Test complementary_helix *)
+  let h3 = complementary_helix h2 in
+  assert (helix_to_string h3 = "TAGC");
+
+  (* Test generate_rna *)
+  let rna = generate_rna h2 in
+  let expected = [ U; A; G; C ] in
+  List.iter2 (fun n1 n2 -> assert (n1 = n2)) rna expected;
+
+  print_endline "All tests passed!"

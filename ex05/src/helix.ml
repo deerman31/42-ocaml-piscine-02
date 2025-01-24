@@ -1,3 +1,5 @@
+let () = Random.self_init ()
+
 type phosphate = string
 type deoxyribose = string
 type nucleobase = A | T | C | G | None
@@ -20,7 +22,6 @@ type helix = nucleotide list
 
 let generate_helix n =
   let random_nucleobase () =
-    Random.self_init ();
     match Random.int 4 with 0 -> 'A' | 1 -> 'T' | 2 -> 'C' | _ -> 'G'
   in
   let rec loop result i =
@@ -68,9 +69,9 @@ let complementary_helix (h : helix) : helix =
         loop (complementary_nucleotide n :: result) rest
   in
   loop [] h
-;;
 
-let lst = generate_helix 5 in
+let () =
+  let lst = generate_helix 5 in
 
-print_endline (helix_to_string lst);
-print_endline (helix_to_string (complementary_helix lst))
+  print_endline (helix_to_string lst);
+  print_endline (helix_to_string (complementary_helix lst))

@@ -15,11 +15,12 @@ let encode lst =
 
   match lst with [] -> [] | first :: rest -> loop [] 1 first rest
 
-let print_lst lst =
-  List.iter (fun (count, str) -> Printf.printf "(%d, %s) " count str) lst;
-  print_newline ()
-
 let () =
+  let print_lst lst =
+    List.iter (fun (count, str) -> Printf.printf "(%d, %s) " count str) lst;
+    print_newline ()
+  in
+
   print_lst (encode [ "a"; "a"; "a"; "b"; "b"; "b" ]);
   print_lst (encode [ "a"; "a"; "a"; "b"; "b"; "c" ]);
   print_lst (encode [])

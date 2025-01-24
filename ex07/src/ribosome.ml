@@ -1,3 +1,5 @@
+let () = Random.self_init ()
+
 type phosphate = string
 type deoxyribose = string
 type nucleobase = A | T | C | G | U | None
@@ -20,7 +22,6 @@ type helix = nucleotide list
 
 let generate_helix n =
   let random_nucleobase () =
-    Random.self_init ();
     match Random.int 4 with 0 -> 'A' | 1 -> 'T' | 2 -> 'C' | _ -> 'G'
   in
   let rec loop result i =
@@ -69,21 +70,15 @@ let complementary_helix (h : helix) : helix =
   loop [] h
 
 type rna = nucleobase list
-
 let generate_rna h =
-  let complementary_nucleotide n =
-    {
-      phosphate = "phosphate";
-      deoxyribose = "deoxyribose";
-      nucleobase =
-        (match n with A -> U | T -> A | C -> G | G -> C | _ -> None);
-    }
+  let complementary_base n =
+    match n with A -> U | T -> A | C -> G | G -> C | _ -> None
   in
   let rec loop result lst =
     match lst with
     | [] -> rev result
     | { phosphate = _; deoxyribose = _; nucleobase = n } :: rest ->
-        loop (complementary_nucleotide n :: result) rest
+        loop (complementary_base n :: result) rest
   in
   loop [] h
 
@@ -266,3 +261,89 @@ let string_of_protein (p : protein) : string =
   in
 
   loop [] p
+
+
+
+
+
+
+
+(* Unit tests for DNA and Protein Generation *)
+
+(* Helper function to run tests *)
+let run_test test_name test_function =
+  try
+    test_function ();
+    Printf.printf "Test %s: PASSED\n" test_name
+  with
+  | failure -> 
+    Printf.printf "Test %s: FAILED - %s\n" test_name (Printexc.to_string failure)
+
+(* Test generate_helix function *)
+let test_generate_helix () =
+  let test_length = 10 in
+  let helix = generate_helix test_length in
+  assert (List.length helix = test_length);
+  List.iter (fun nucleotide ->
+    assert (
+      nucleotide.phosphate = "phosphate" &&
+      nucleotide.deoxyribose = "deoxyribose" &&
+      match nucleotide.nucleobase with 
+      | A | T | C | G -> true 
+      | _ -> false
+    )
+  ) helix
+
+(* Test complementary_helix function *)
+let test_complementary_helix () =
+  let original_helix = generate_helix 5 in
+  let complementary = complementary_helix original_helix in
+  
+  (* Check length is the same *)
+  assert (List.length original_helix = List.length complementary);
+  
+  (* Check complementary base pairing *)
+  List.iter2 (fun orig comp ->
+    match orig.nucleobase, comp.nucleobase with
+    | A, T | T, A | C, G | G, C -> ()
+    | _ -> failwith "Invalid complementary base pairing"
+  ) original_helix complementary
+
+(* Test generate_rna function *)
+let test_generate_rna () =
+  let original_helix = generate_helix 6 in
+  let rna = generate_rna original_helix in
+  
+  (* Check RNA conversion rules *)
+  List.iter2 (fun orig rna_base ->
+    match orig.nucleobase, rna_base with
+    | A, U | T, A | C, G | G, C -> ()
+    | _ -> failwith "Invalid RNA transcription"
+  ) original_helix rna
+
+(* Test decode_arn function *)
+let test_decode_arn () =
+  (* Test a known RNA sequence that should produce a specific protein *)
+  let test_rna = [A; U; G; C; C; A; A; U; G] in
+  let protein = decode_arn test_rna in
+  
+  (* This is a sample check - the exact protein depends on the specific codon mapping *)
+  assert (List.length protein > 0);
+  List.iter (fun amino_acid ->
+    match amino_acid with
+    | Stop | Ala | Arg | Asn | Asp | Cys | Gln | Glu 
+    | Gly | His | Ile | Leu | Lys | Met | Phe 
+    | Pro | Ser | Thr | Trp | Tyr | Val -> ()
+  ) protein
+
+(* Run all tests *)
+let run_all_tests () =
+  Printf.printf "Starting DNA and Protein Generation Tests\n";
+  run_test "Generate Helix" test_generate_helix;
+  run_test "Complementary Helix" test_complementary_helix;
+  run_test "Generate RNA" test_generate_rna;
+  run_test "Decode ARN" test_decode_arn;
+  Printf.printf "Tests Completed\n"
+
+(* Uncomment to run tests *)
+let () = run_all_tests ()

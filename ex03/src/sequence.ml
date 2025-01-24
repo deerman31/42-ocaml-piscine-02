@@ -1,33 +1,80 @@
-let run_length_encode seq =
-  let len = String.length seq in
-
-  let rec loop result current i =
-    if i >= len then
-      result ^ string_of_int (String.length current) ^ String.make 1 current.[0]
-    else if current.[0] = seq.[i] then
-      loop result (current ^ String.make 1 seq.[i]) (i + 1)
-    else
-      loop
-        (result
-        ^ string_of_int (String.length current)
-        ^ String.make 1 current.[0])
-        (String.make 1 seq.[i])
-        (i + 1)
+let contains n lst =
+  let rec loop lst =
+    match lst with
+    | [] -> false
+    | first :: rest -> if first = n then true else loop rest
   in
+  loop lst
 
-  loop "" (String.make 1 seq.[0]) 1
+let rev lst =
+  let rec loop acc lst =
+    match lst with [] -> acc | first :: rest -> loop (first :: acc) rest
+  in
+  loop [] lst
+
+let length lst =
+  let rec loop acc lst =
+    match lst with [] -> acc | _ :: rest -> loop (acc + 1) rest
+  in
+  loop 0 lst
+
+let length_lst_add lst =
+  let hd lst = match lst with [] -> 0 | first :: _ -> first in
+  length lst :: [ hd lst ]
+
+let lsts_map f lsts =
+  let rec loop acc lsts =
+    match lsts with
+    | [] -> rev acc
+    | first :: rest -> loop (f first :: acc) rest
+  in
+  loop [] lsts
+
+let rec append lst1 lst2 =
+  match lst1 with [] -> lst2 | first :: rest -> first :: append rest lst2
+
+let concat lsts =
+  let rec loop acc lsts =
+    match lsts with [] -> acc | first :: rest -> loop (append first acc) rest
+  in
+  loop [] (rev lsts)
+
+let same_split_lst lst =
+  let rec loop acc1 acc2 lst =
+    match lst with
+    | [] -> rev (acc2 :: acc1)
+    | first :: rest ->
+        if acc1 = [] && acc2 = [] then loop acc1 [ first ] rest
+        else if contains first acc2 then loop acc1 (first :: acc2) rest
+        else loop (acc2 :: acc1) [ first ] rest
+  in
+  loop [] [] lst
+
+let run_len_encode lst =
+  let lsts = same_split_lst lst in
+
+  let new_lsts = lsts_map length_lst_add lsts in
+
+  concat new_lsts
 
 let sequence n =
   let rec loop acc i =
-    if i >= n then acc else loop (run_length_encode acc) (i + 1)
+    if n <= i then acc else loop (run_len_encode acc) (i + 1)
   in
-  if n <= 0 then "" else loop "1" 1
-;;
+  let result = if n <= 0 then [] else loop [ 1 ] 1 in
+  let rec convert_string lst =
+    match lst with
+    | [] -> ""
+    | first :: rest -> string_of_int first ^ convert_string rest
+  in
 
-print_endline (sequence 1);
-print_endline (sequence 2);
-print_endline (sequence 3);
-print_endline (sequence 4);
-print_endline (sequence 5);
-print_endline (sequence 6);
-print_endline (sequence 7)
+  convert_string result
+
+let () =
+  print_endline (sequence 1);
+  print_endline (sequence 2);
+  print_endline (sequence 3);
+  print_endline (sequence 4);
+  print_endline (sequence 5);
+  print_endline (sequence 6);
+  print_endline (sequence 7)

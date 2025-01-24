@@ -71,8 +71,8 @@ let gray n =
       loop lst
     in
     print_lst_string (loop [] 0)
-;;
 
-gray 1;
-gray 2;
-gray 3
+let () =
+  gray 1;
+  gray 2;
+  gray 3
