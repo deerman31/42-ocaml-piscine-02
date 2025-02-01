@@ -7,7 +7,10 @@ let rev lst =
 let gray n =
   if n <= 0 then ()
   else
+    (* 引数のdigitsのbitの最大値を取得する関数 *)
+    (* digits: bitの桁数 *)
     let max_binaly_value digits =
+      (* acc1: 現在の合計値, acc2: 現在のbit数, i: 現在の桁数*)
       let rec loop acc1 acc2 i =
         if i >= digits then acc1 else loop (acc1 + acc2) (acc2 * 2) (i + 1)
       in
@@ -16,6 +19,7 @@ let gray n =
 
     (* digits桁のbitの最大値を返す関数 *)
     let max_value = max_binaly_value n in
+
     let pad_binary binaly bit =
       let rec loop binaly =
         if String.length binaly = bit then binaly else loop ("0" ^ binaly)
@@ -23,6 +27,7 @@ let gray n =
       loop binaly
     in
 
+    (* 引数の整数をbinaryに変更 *)
     let int_to_binary n =
       let rec loop acc n =
         if n <= 0 then if acc = "" then "0" ^ acc else acc
@@ -32,6 +37,13 @@ let gray n =
       loop "" n
     in
 
+    (*
+グレイコードからバイナリコードへの変換をする
+グレイコードからバイナリコードに変換する場合は以下の規則に従う。
+最上位桁の1は同一
+以下、上位から2桁ずつ見ていき、
+1か0が連続していればグレイコードは0、連続していなければ1とする。
+    *)
     let gray_convert binaly =
       let digits = String.length binaly in
       let string_rev s =
@@ -53,9 +65,13 @@ let gray n =
     let rec loop acc i =
       if i > max_value then rev acc
       else
-        let binaly = pad_binary (int_to_binary i) n in
-        let gray_num = gray_convert binaly in
+        let original_binary = int_to_binary i in
 
+        let binaly = pad_binary original_binary n in
+
+        let gray_num = gray_convert binaly in
+        (* Printf.printf "[%d] -> [%s] -> [%s] -> [%s]\n" i original_binary binaly
+           gray_num; *)
         loop (gray_num :: acc) (i + 1)
     in
 

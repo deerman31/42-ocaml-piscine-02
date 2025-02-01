@@ -10,7 +10,7 @@ let rev lst =
   in
   loop [] lst
 
-let filter p lst lst2 =
+let filter2 p lst lst2 =
   let rec loop acc lst =
     match lst with
     | [] -> rev acc
@@ -29,11 +29,12 @@ let contains n lst =
 
 let crossover lst1 lst2 =
   match (lst1, lst2) with
+  | [], [] -> []
   | [], _ -> []
   | _, [] -> []
   | _, _ ->
-      if length lst1 > length lst2 then filter contains lst1 lst2
-      else filter contains lst2 lst1
+      if length lst1 > length lst2 then filter2 contains lst1 lst2
+      else filter2 contains lst2 lst1
 
 let () =
   let rec print_list_string l =

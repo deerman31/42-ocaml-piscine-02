@@ -51,10 +51,13 @@ let same_split_lst lst =
   loop [] [] lst
 
 let run_len_encode lst =
+  (*同じ数字ごとにlstにまとめ、int listのlistを作成する*)
   let lsts = same_split_lst lst in
 
+  (* listの長さを調べ、その長さとlstの要素一個のlistを作成 [[1 ; 1 ; 1 ; 1] ; [3 ; 3]] -> [[4 ; 1] ; [2 ; 3]]*)
   let new_lsts = lsts_map length_lst_add lsts in
 
+  (* listのlistを一つのlistにまとめる*)
   concat new_lsts
 
 let sequence n =
@@ -77,4 +80,10 @@ let () =
   print_endline (sequence 4);
   print_endline (sequence 5);
   print_endline (sequence 6);
-  print_endline (sequence 7)
+  print_endline (sequence 7);
+  print_endline (sequence 8);
+
+  print_endline "-------------------";
+  print_endline (sequence 0);
+  print_endline (sequence (-1));
+  print_endline (sequence 1)
