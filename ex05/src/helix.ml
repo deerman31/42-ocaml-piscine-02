@@ -1,5 +1,6 @@
 let () = Random.self_init ()
 
+(* EX04 *)
 type phosphate = string
 type deoxyribose = string
 type nucleobase = A | T | C | G | None
@@ -18,12 +19,14 @@ let generate_nucleotide t =
       (match t with 'A' -> A | 'T' -> T | 'C' -> C | 'G' -> G | _ -> None);
   }
 
+(* EX05 *)
 type helix = nucleotide list
 
-let generate_helix n =
+let generate_helix n : helix =
   let random_nucleobase () =
     match Random.int 4 with 0 -> 'A' | 1 -> 'T' | 2 -> 'C' | _ -> 'G'
   in
+
   let rec loop result i =
     if i <= 0 then result
     else
@@ -71,7 +74,27 @@ let complementary_helix (h : helix) : helix =
   loop [] h
 
 let () =
-  let lst = generate_helix 5 in
+  (* Test generate_helix *)
+  let h1 = generate_helix 5 in
+  assert (List.length h1 = 5);
+  List.iter
+    (fun n ->
+      assert (n.phosphate = "phosphate" && n.deoxyribose = "deoxyribose"))
+    h1;
 
-  print_endline (helix_to_string lst);
-  print_endline (helix_to_string (complementary_helix lst))
+  (* Test helix_to_string *)
+  let h2 =
+    [
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = A };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = T };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = C };
+      { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = G };
+    ]
+  in
+  assert (helix_to_string h2 = "ATCG");
+
+  (* Test complementary_helix *)
+  let h3 = complementary_helix h2 in
+  assert (helix_to_string h3 = "TAGC");
+
+  print_endline "All tests passed!"

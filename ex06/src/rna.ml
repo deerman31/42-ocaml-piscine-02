@@ -1,9 +1,11 @@
 let () = Random.self_init ()
 
+(* EX04 *)
+
 type phosphate = string
 type deoxyribose = string
 
-(* type nucleobase = A | T | C | G | U | None *)
+(* Uを追加*)
 type nucleobase = A | T | C | G | U | None
 
 type nucleotide = {
@@ -20,9 +22,10 @@ let generate_nucleotide t =
       (match t with 'A' -> A | 'T' -> T | 'C' -> C | 'G' -> G | _ -> None);
   }
 
+(* EX05 *)
 type helix = nucleotide list
 
-let generate_helix n =
+let generate_helix n : helix =
   let random_nucleobase () =
     match Random.int 4 with 0 -> 'A' | 1 -> 'T' | 2 -> 'C' | _ -> 'G'
   in
@@ -71,11 +74,10 @@ let complementary_helix (h : helix) : helix =
   in
   loop [] h
 
+(* EX06 *)
 type rna = nucleobase list
 
-(* generate_rna の修正 *)
-
-let generate_rna h =
+let generate_rna (h : helix) : rna =
   let complementary_base n =
     match n with A -> U | T -> A | C -> G | G -> C | _ -> None
   in
@@ -88,16 +90,7 @@ let generate_rna h =
   loop [] h
 
 let () =
-  (* Test generate_helix *)
-  let h1 = generate_helix 5 in
-  assert (List.length h1 = 5);
-  List.iter
-    (fun n ->
-      assert (n.phosphate = "phosphate" && n.deoxyribose = "deoxyribose"))
-    h1;
-
-  (* Test helix_to_string *)
-  let h2 =
+  let h =
     [
       { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = A };
       { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = T };
@@ -105,14 +98,9 @@ let () =
       { phosphate = "phosphate"; deoxyribose = "deoxyribose"; nucleobase = G };
     ]
   in
-  assert (helix_to_string h2 = "ATCG");
-
-  (* Test complementary_helix *)
-  let h3 = complementary_helix h2 in
-  assert (helix_to_string h3 = "TAGC");
 
   (* Test generate_rna *)
-  let rna = generate_rna h2 in
+  let rna = generate_rna h in
   let expected = [ U; A; G; C ] in
   List.iter2 (fun n1 n2 -> assert (n1 = n2)) rna expected;
 
