@@ -39,16 +39,16 @@ let concat lsts =
   in
   loop [] (rev lsts)
 
+
 let same_split_lst lst =
   let rec loop acc1 acc2 lst =
     match lst with
     | [] -> rev (acc2 :: acc1)
     | first :: rest ->
-        if acc1 = [] && acc2 = [] then loop acc1 [ first ] rest
-        else if contains first acc2 then loop acc1 (first :: acc2) rest
+        if contains first acc2 then loop acc1 (first :: acc2) rest
         else loop (acc2 :: acc1) [ first ] rest
   in
-  loop [] [] lst
+  match lst with [] -> [] | first :: rest -> loop [] [ first ] rest
 
 let run_len_encode lst =
   (*同じ数字ごとにlstにまとめ、int listのlistを作成する*)
